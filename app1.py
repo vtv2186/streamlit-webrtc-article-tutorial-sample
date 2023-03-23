@@ -24,8 +24,24 @@ def callback(frame):
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
 
+class VideoProcessor:
+    def __init__(self) -> None:
+        self.threshold1 = 100
+        self.threshold2 = 200
 
-webrtc_streamer(key="example",video_frame_callback=callback, rtc_configuration={  # Add this line
+    def recv(self, frame):
+        img = frame.to_ndarray(format="bgr24")
+
+        img = cv2.cvtColor(cv2.Canny(img, self.threshold1, self.threshold2), cv2.COLOR_GRAY2BGR)
+
+        return av.VideoFrame.from_ndarray(img, format="bgr24")
+
+
+
+
+ctx=webrtc_streamer(key="example",
+                video_processor=VideoProcessor,
+                rtc_configuration={  # Add this line
         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
     }
     )
